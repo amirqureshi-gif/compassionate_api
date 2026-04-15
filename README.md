@@ -29,7 +29,9 @@ npm run dev
 
 ## Railway variables (API service)
 
-- `DATABASE_URL` (from Railway Postgres)
+- Database connection (pick one):
+  - `DATABASE_URL` (recommended; from Railway Postgres)
+  - or Railway-style parts: `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`
 - `JWT_SECRET`
 - `ALLOWED_ORIGINS` (comma-separated)
 - `ADMIN_EMAIL` and `ADMIN_PASSWORD` (first deploy only; optional but recommended)
