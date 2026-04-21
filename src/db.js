@@ -70,6 +70,14 @@ async function ensureSchema() {
       created_at timestamptz not null default now()
     );
   `);
+
+  await query(`
+    create table if not exists site_sections (
+      section_key text primary key,
+      data jsonb not null default '{}'::jsonb,
+      updated_at timestamptz not null default now()
+    );
+  `);
 }
 
 module.exports = { query, ensureSchema };

@@ -5,8 +5,11 @@ const helmet = require('helmet');
 const cors = require('cors');
 
 const { ensureSchema, query } = require('./src/db');
+const { seedMissingSections } = require('./src/siteRepo');
 const authRoutes = require('./src/routes/auth');
 const healthRoutes = require('./src/routes/health');
+const publicSiteRoutes = require('./src/routes/publicSite');
+const adminSiteRoutes = require('./src/routes/adminSite');
 const bcrypt = require('bcryptjs');
 
 const app = express();
@@ -44,6 +47,8 @@ app.get('/', (req, res) => {
 
 app.use('/health', healthRoutes);
 app.use('/auth', authRoutes);
+app.use('/public', publicSiteRoutes);
+app.use('/admin', adminSiteRoutes);
 
 async function ensureBootstrapAdmin() {
   const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
@@ -63,6 +68,7 @@ async function ensureBootstrapAdmin() {
 
 async function main() {
   await ensureSchema();
+  await seedMissingSections();
   await ensureBootstrapAdmin();
 
   const port = process.env.PORT ? Number(process.env.PORT) : 8080;
