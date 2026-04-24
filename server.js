@@ -3,16 +3,21 @@ require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 
 const { ensureSchema, query } = require('./src/db');
 const { seedMissingSections } = require('./src/siteRepo');
 const authRoutes = require('./src/routes/auth');
 const healthRoutes = require('./src/routes/health');
 const publicSiteRoutes = require('./src/routes/publicSite');
+const publicClientRoutes = require('./src/routes/publicClient');
+const publicFormsRoutes = require('./src/routes/publicForms');
 const adminSiteRoutes = require('./src/routes/adminSite');
 const bcrypt = require('bcryptjs');
 
 const app = express();
+
+app.set('trust proxy', 1);
 
 app.disable('x-powered-by');
 app.use(
@@ -23,6 +28,14 @@ app.use(
 );
 
 app.use(express.json({ limit: '1mb' }));
+
+const formsLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: Number(process.env.FORMS_RATE_LIMIT_MAX || 15),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many form submissions from this network. Please try again later.' }
+});
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
@@ -47,7 +60,9 @@ app.get('/', (req, res) => {
 
 app.use('/health', healthRoutes);
 app.use('/auth', authRoutes);
+app.use('/public', publicClientRoutes);
 app.use('/public', publicSiteRoutes);
+app.use('/public', formsLimiter, publicFormsRoutes);
 app.use('/admin', adminSiteRoutes);
 
 async function ensureBootstrapAdmin() {

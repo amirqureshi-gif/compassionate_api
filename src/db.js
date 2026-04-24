@@ -78,6 +78,31 @@ async function ensureSchema() {
       updated_at timestamptz not null default now()
     );
   `);
+
+  await query(`
+    create table if not exists app_settings (
+      key text primary key,
+      value text not null default '',
+      updated_at timestamptz not null default now()
+    );
+  `);
+
+  await query(`
+    create table if not exists form_submissions (
+      id bigserial primary key,
+      form_type text not null,
+      submitter_email text,
+      payload jsonb not null default '{}'::jsonb,
+      image_urls jsonb not null default '[]'::jsonb,
+      client_ip text,
+      created_at timestamptz not null default now()
+    );
+  `);
+
+  await query(`
+    create index if not exists form_submissions_type_created_at_idx
+    on form_submissions (form_type, created_at desc);
+  `);
 }
 
 module.exports = { query, ensureSchema };
