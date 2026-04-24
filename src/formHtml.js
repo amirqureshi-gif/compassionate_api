@@ -47,12 +47,18 @@ function wrapEmailPage({ preheader, title, subtitle, bodyHtml }) {
           <div style="background:#0b1220;border-radius:14px;padding:14px 16px;margin-bottom:14px;">
             ${
               safeLogoUrl
-                ? `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-                    <img src="${safeLogoUrl}" alt="Compassionate Alliance" height="36" style="display:block;height:36px;width:auto;border-radius:10px;" />
-                    <div style="font-family:system-ui,Segoe UI,sans-serif;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#86efac;font-weight:700;">
-                      Compassionate Alliance
-                    </div>
-                  </div>`
+                ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 10px 0;">
+                    <tr>
+                      <td style="vertical-align:middle;padding:0 12px 0 0;">
+                        <img src="${safeLogoUrl}" alt="Compassionate Alliance" width="160" height="36" style="display:block;width:160px;max-width:160px;height:36px;max-height:36px;object-fit:contain;border:0;outline:none;text-decoration:none;" />
+                      </td>
+                      <td style="vertical-align:middle;">
+                        <div style="font-family:system-ui,Segoe UI,sans-serif;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#86efac;font-weight:700;white-space:nowrap;">
+                          Compassionate Alliance
+                        </div>
+                      </td>
+                    </tr>
+                  </table>`
                 : `<div style="font-family:system-ui,Segoe UI,sans-serif;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#86efac;font-weight:700;">
                     Compassionate Alliance
                   </div>`
