@@ -76,10 +76,12 @@ async function requireServices(res, { needCloudinary }) {
 }
 
 async function saveSubmission(formType, submitterEmail, payload, imageUrls, clientIp) {
+  const payloadJson = JSON.stringify(payload || {});
+  const imageUrlsJson = JSON.stringify(Array.isArray(imageUrls) ? imageUrls : []);
   const { rows } = await query(
     `insert into form_submissions (form_type, submitter_email, payload, image_urls, client_ip)
      values ($1, $2, $3::jsonb, $4::jsonb, $5) returning id`,
-    [formType, submitterEmail, payload, imageUrls, clientIp]
+    [formType, submitterEmail, payloadJson, imageUrlsJson, clientIp]
   );
   return rows[0].id;
 }
