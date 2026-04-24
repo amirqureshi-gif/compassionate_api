@@ -30,6 +30,8 @@ function wrapEmailPage({ preheader, title, subtitle, bodyHtml }) {
   const ph = preheader ? escapeHtml(preheader) : '';
   const t = title ? escapeHtml(title) : '';
   const sub = subtitle ? escapeHtml(subtitle) : '';
+  const logoUrl = String(process.env.EMAIL_LOGO_URL || '').trim();
+  const safeLogoUrl = logoUrl ? escapeHtml(logoUrl) : '';
 
   return `<!doctype html>
   <html>
@@ -43,9 +45,18 @@ function wrapEmailPage({ preheader, title, subtitle, bodyHtml }) {
       <div style="padding:28px 16px;">
         <div style="max-width:680px;margin:0 auto;">
           <div style="background:#0b1220;border-radius:14px;padding:14px 16px;margin-bottom:14px;">
-            <div style="font-family:system-ui,Segoe UI,sans-serif;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#86efac;font-weight:700;">
-              Compassionate Alliance
-            </div>
+            ${
+              safeLogoUrl
+                ? `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                    <img src="${safeLogoUrl}" alt="Compassionate Alliance" height="36" style="display:block;height:36px;width:auto;border-radius:10px;" />
+                    <div style="font-family:system-ui,Segoe UI,sans-serif;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#86efac;font-weight:700;">
+                      Compassionate Alliance
+                    </div>
+                  </div>`
+                : `<div style="font-family:system-ui,Segoe UI,sans-serif;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#86efac;font-weight:700;">
+                    Compassionate Alliance
+                  </div>`
+            }
             <div style="font-family:system-ui,Segoe UI,sans-serif;font-size:18px;color:#eaf0ff;font-weight:800;margin-top:6px;">
               ${t}
             </div>
