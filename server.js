@@ -37,17 +37,51 @@ const formsLimiter = rateLimit({
   message: { message: 'Too many form submissions from this network. Please try again later.' }
 });
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+function normalizeOrigin(origin) {
+  if (!origin) return '';
+  try {
+    return new URL(String(origin)).origin.toLowerCase();
+  } catch {
+    return String(origin).trim().replace(/\/+$/, '').toLowerCase();
+  }
+}
+
+function expandWwwOrigins(origins) {
+  const out = new Set();
+  for (const raw of origins) {
+    const o = normalizeOrigin(raw);
+    if (!o) continue;
+    out.add(o);
+    try {
+      const u = new URL(o);
+      const host = u.hostname;
+      if (host.startsWith('www.')) {
+        const non = `${u.protocol}//${host.slice(4)}`;
+        out.add(non);
+      } else {
+        const www = `${u.protocol}//www.${host}`;
+        out.add(www);
+      }
+    } catch {
+      // ignore non-url values
+    }
+  }
+  return Array.from(out);
+}
+
+const allowedOriginsRaw = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+const allowedOrigins = expandWwwOrigins(allowedOriginsRaw);
 
 app.use(
   cors({
     origin: function (origin, cb) {
       if (!origin) return cb(null, true); // server-to-server or curl
       if (allowedOrigins.length === 0) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
+      const o = normalizeOrigin(origin);
+      if (allowedOrigins.includes(o)) return cb(null, true);
       return cb(new Error('Not allowed by CORS'));
     },
     credentials: true
